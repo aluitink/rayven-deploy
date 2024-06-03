@@ -48,7 +48,7 @@
     }
   },
   "variables": {
-    "packageFileUri": "[uri(deployment().properties.templateLink.uri, 'minimal-template.zip')]"
+    "packageFileUri": "[uri(deployment().properties.templateLink.uri, 'rayven-test.zip')]"
   },
   "resources": [
     {
