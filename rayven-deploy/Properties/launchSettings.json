@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "rayven_deploy": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7093",
+      "launchBrowser": false
+    }
+  }
+}
