@@ -2,81 +2,47 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "name": {
-      "type": "string",
-      "defaultValue": "ManagedServiceFabric",
-      "metadata": {
-        "description": "Provide a name for the managed application"
-      }
+    "instanceName": {
+      "defaultValue": "rayven-app",
+      "type": "String"
+    },
+    "customDomain": {
+      "defaultValue": "",
+      "type": "String"
     },
     "location": {
       "type": "string",
-      "metadata": {
-        "description": "Specify the Azure region to place the application definition"
-      }
-    },
-    "lockLevel": {
-      "type": "string",
-      "allowedValues": [
-        "ReadOnly",
-        "CanNotDelete"
-      ],
-      "defaultValue": "ReadOnly",
-      "metadata": {
-        "description": "Specify the resource lock being used for the managed application"
-      }
-    },
-    "authorizations": {
-      "type": "array",
-      "metadata": {
-        "description": "Provide the authorization mapping for the managed application."
-      }
-    },
-    "description": {
-      "type": "string",
-      "defaultValue": "Managed Azure Service Fabric with Azure mgmt services",
-      "metadata": {
-        "description": "Provide a brief description of the managed application"
-      }
-    },
-    "displayName": {
-      "type": "string",
-      "defaultValue": "Managed Azure Service Fabric",
-      "metadata": {
-        "description": "Display name for the managed application"
-      }
+      "defaultValue": "[resourceGroup().location]"
     }
   },
   "variables": {
-    "packageFileUri": "[uri(deployment().properties.templateLink.uri, 'rayven-test.zip')]"
+    "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]"
   },
   "resources": [
     {
-      "apiVersion": "2017-09-01",
-      "name": "[parameters('name')]",
-      "location": "[parameters('location')]",
-      "type": "Microsoft.Solutions/applicationDefinitions",
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-12-01",
+      "name": "[parameters('instanceName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+
+      },
+      "sku": {
+        "name": "Free",
+        "tier": "Free"
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites/basicAuth",
+      "apiVersion": "2023-12-01",
+      "name": "[concat(parameters('instanceName'), '/default')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
       "properties": {
-        "lockLevel": "[parameters('lockLevel')]",
-        "authorizations": "[array(parameters('authorizations'))]",
-        "description": "[parameters('description')]",
-        "displayName": "[parameters('displayName')]",
-        "packageFileUri": "[variables('packageFileUri')]"
+        "applicableEnvironmentsMode": "SpecifiedEnvironments"
       }
     }
-  ],
-  "outputs": {
-    "managedApplicationName": {
-      "type": "string",
-      "value": "[parameters('name')]"
-    },
-    "lockLevel": {
-      "type": "string",
-      "value": "[parameters('locklevel')]"
-    },
-    "packageFileUri": {
-      "type": "string",
-      "value": "[variables('packageFileUri')]"
-    }
-  }
+  ]
 }
