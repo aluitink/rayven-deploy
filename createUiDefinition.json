@@ -19,7 +19,8 @@
 
     ],
     "outputs": {
-      "instanceName": "basics('instanceName')]"
+      "instanceName": "basics('instanceName')]",
+      "location": "[location()]"
     }
   }
 }
