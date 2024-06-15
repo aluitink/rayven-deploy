@@ -4,9 +4,9 @@
 name: Build and deploy dotnet core project to Azure Function App - rayven-deploy
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 env:
