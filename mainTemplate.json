@@ -2,26 +2,43 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "username": {
-      "type": "string"
+    "instanceName": {
+      "defaultValue": "rayven-app",
+      "type": "String"
+    },
+    "customDomain": {
+      "defaultValue": "",
+      "type": "String"
     }
+  },
+  "variables": {
+    "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]"
   },
   "resources": [
     {
-      "apiVersion": "2019-10-01",
-      "name": "pid-<Tracking GUID registered at https://partner.microsoft.com/dashboard/account/management>",
-      "type": "Microsoft.Resources/deployments",
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-12-01",
+      "name": "[parameters('instanceName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+
+      },
+      "sku": {
+        "name": "Free",
+        "tier": "Free"
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites/basicAuth",
+      "apiVersion": "2023-12-01",
+      "name": "[concat(parameters('instanceName'), '/default')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
       "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "resources": []
-        }
+        "applicableEnvironmentsMode": "SpecifiedEnvironments"
       }
     }
-  ],
-  "outputs": {
-
-  }
+  ]
 }

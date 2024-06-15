@@ -4,47 +4,11 @@
   "parameters": {
     "name": {
       "type": "string",
-      "defaultValue": "ManagedWebApp",
-      "metadata": {
-        "description": "Provide a name for the managed application"
-      }
+      "defaultValue": "rayven"
     },
     "location": {
       "type": "string",
-      "metadata": {
-        "description": "Specify the Azure region to place the application definition"
-      }
-    },
-    "lockLevel": {
-      "type": "string",
-      "allowedValues": [
-        "ReadOnly",
-        "CanNotDelete"
-      ],
-      "defaultValue": "ReadOnly",
-      "metadata": {
-        "description": "Specify the resource lock being used for the managed application"
-      }
-    },
-    "authorizations": {
-      "type": "array",
-      "metadata": {
-        "description": "Provide the authorization mapping for the managed application."
-      }
-    },
-    "description": {
-      "type": "string",
-      "defaultValue": "Managed Azure IaaS Web Application",
-      "metadata": {
-        "description": "Provide a brief description of the managed application"
-      }
-    },
-    "displayName": {
-      "type": "string",
-      "defaultValue": "Managed Azure Web Application",
-      "metadata": {
-        "description": "Display name for the managed application"
-      }
+      "defaultValue": "[resourceGroup().location]"
     }
   },
   "variables": {
@@ -66,13 +30,13 @@
     }
   ],
   "outputs": {
-    "managedApplicationName": {
+    "resourceName": {
       "type": "string",
       "value": "[parameters('name')]"
     },
-    "lockLevel": {
+    "resourceLocation": {
       "type": "string",
-      "value": "[parameters('locklevel')]"
+      "value": "[parameters('location')]"
     },
     "packageFileUri": {
       "type": "string",
