@@ -54,12 +54,6 @@
         "parameters": {
           "location": {
             "value": "[resourceGroup().location]"
-          },
-          "storageAccountName": {
-            "value": "[parameters('storageAccountName')]"
-          },
-          "storageAccountType": {
-            "value": "[parameters('storageAccountType')]"
           }
         }
       }
