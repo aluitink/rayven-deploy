@@ -39,6 +39,16 @@
       "properties": {
         "applicableEnvironmentsMode": "SpecifiedEnvironments"
       }
+    },
+    {
+      "type": "Microsoft.Web/staticSites/customDomains",
+      "apiVersion": "2023-12-01",
+      "name": "[parameters('customDomainName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
+      "properties": {}
     }
   ]
 }
