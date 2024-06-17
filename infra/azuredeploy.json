@@ -3,8 +3,8 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "instanceName": {
-      "defaultValue": "rayven-app",
-      "type": "String"
+      "defaultValue": "rayven",
+      "type": "string"
     },
     "databaseName": {
       "type": "string",
@@ -21,8 +21,8 @@
       "allowedValues": [ "Free", "Pay as you go" ]
     },
     "customDomain": {
-      "defaultValue": "",
-      "type": "String"
+      "defaultValue": "domain.tdl",
+      "type": "string"
     },
     "storageAccountType": {
       "type": "string",

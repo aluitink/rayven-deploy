@@ -4,7 +4,7 @@
   "parameters": {
     "instanceName": {
       "defaultValue": "rayven-app",
-      "type": "String"
+      "type": "string"
     },
     "webSku": {
       "type": "string",
@@ -13,7 +13,7 @@
     },
     "customDomain": {
       "defaultValue": "domain.tdl",
-      "type": "String"
+      "type": "string"
     },
     "databaseAccountName": {
       "type": "string"

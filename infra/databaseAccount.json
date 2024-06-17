@@ -3,6 +3,7 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"instanceName": {
+			"defaultValue": "rayven-app",
 			"type": "string"
 		},
 		"databaseName": {
