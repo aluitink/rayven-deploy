@@ -12,7 +12,7 @@
       "allowedValues": [ "Free", "Paid" ]
     },
     "customDomain": {
-      "defaultValue": "",
+      "defaultValue": "domain.tdl",
       "type": "String"
     },
     "databaseAccountName": {
@@ -32,10 +32,9 @@
     }
   },
   "variables": {
-    "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]",
-    "customUrl": "[concat('https://', variables('customDomainName'))]",
-    "storageDomainName": "[concat('z', variables('customDomainName'))]",
-    "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]"
+    "customUrl": "[concat('https://', parameters('customDomain'))]",
+    "storageDomainName": "[concat('z', parameters('customDomain'))]",
+    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]"
   },
   "resources": [
     {
@@ -62,13 +61,13 @@
           "properties": {
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
-            "ApiSettings__PrimarySuffix": "[variables('customDomainName')]",
+            "ApiSettings__PrimarySuffix": "[parameters('customDomain')]",
             "ApiSettings__PrimaryUrl": "[variables('customUrl')]",
             "ApiSettings__RequireAcceptHeader": "false",
             "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
             "ApiSettings__StorageUrl": "[variables('storageUrl')]",
             "OpenApi__HostNames": "",
-            "Rayven_PrimarySuffix": "[variables('customDomainName')]",
+            "Rayven_PrimarySuffix": "[parameters('customDomain')]",
             "Rayven_PrimaryUrl": "[variables('customUrl')]",
             "Rayven__StorageUrl": "[variables('storageUrl')]",
             "Rayven__StorageConnectionString": "[parameters('storageConnectionString')]",
