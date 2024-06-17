@@ -52,7 +52,7 @@
   },
   "resources": [
     {
-      "name": "linkedTemplate",
+      "name": "databaseTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "properties": {
@@ -74,7 +74,7 @@
       }
     },
     {
-      "name": "linkedTemplate",
+      "name": "storageTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "properties": {
@@ -96,7 +96,7 @@
       }
     },
     {
-      "name": "linkedTemplate",
+      "name": "staticWebAppTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "properties": {
@@ -112,19 +112,19 @@
             "value": "[parameters('webSku')]"
           },
           "databaseAccountName": {
-            "value": "[reference('linkedTemplate').outputs.databaseAccountName.value]"
+            "value": "[reference('databaseTemplate').outputs.databaseAccountName.value]"
           },
           "databaseConnectionString": {
-            "value": "[reference('linkedTemplate').outputs.databaseConnectionString.value]"
+            "value": "[reference('databaseTemplate').outputs.databaseConnectionString.value]"
           },
           "databaseName": {
             "value": "[parameters('databaseName')]"
           },
           "storageAccountName": {
-            "value": "[reference('linkedTemplate').outputs.storageAccountName.value]"
+            "value": "[reference('storageTemplate').outputs.storageAccountName.value]"
           },
           "storageConnectionString": {
-            "value": "[reference('linkedTemplate').outputs.storageConnectionString.value]"
+            "value": "[reference('storageTemplate').outputs.storageConnectionString.value]"
           }
         }
       }
