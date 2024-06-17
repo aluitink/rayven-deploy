@@ -1,0 +1,134 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "instanceName": {
+      "defaultValue": "rayven-app",
+      "type": "String"
+    },
+    "databaseName": {
+      "type": "string",
+      "defaultValue": "Rayven"
+    },
+    "webSku": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [ "Free", "Paid" ]
+    },
+    "databaseSku": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [ "Free", "Pay as you go" ]
+    },
+    "customDomain": {
+      "defaultValue": "",
+      "type": "String"
+    },
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Premium_LRS",
+        "Premium_ZRS",
+        "Standard_GRS",
+        "Standard_GZRS",
+        "Standard_LRS",
+        "Standard_RAGRS",
+        "Standard_RAGZRS",
+        "Standard_ZRS"
+      ],
+      "metadata": {
+        "description": "Storage Account type"
+      }
+    }
+  },
+  "variables": {
+    "databaseIsFreeTier": "[equals(parameters('databaseSku'), 'Free')]",
+    "storageAccountName": "[format('rayven{0}', uniqueString(resourceGroup().id))]",
+    "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]",
+    "customUrl": "[concat('https://', variables('customDomainName'))]",
+    "storageDomainName": "[concat('z', variables('customDomainName'))]",
+    "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]"
+  },
+  "resources": [
+    {
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "relativePath": "databaseAccount.json"
+        },
+        "parameters": {
+          "instanceName": {
+            "value": "[parameters('instanceName')]"
+          },
+          "databaseName": {
+            "value": "[parameters('databaseName')]"
+          },
+          "databaseSku": {
+            "value": "[parameters('databaseSku')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "relativePath": "storageAccount.json"
+        },
+        "parameters": {
+          "instanceName": {
+            "value": "[parameters('instanceName')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "storageAccountType": {
+            "value": "[parameters('storageAccountType')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "relativePath": "staticWebApp.json"
+        },
+        "parameters": {
+          "instanceName": {
+            "value": "[parameters('instanceName')]"
+          },
+          "webSku": {
+            "value": "[parameters('webSku')]"
+          },
+          "databaseAccountName": {
+            "value": "[reference('linkedTemplate').outputs.databaseAccountName.value]"
+          },
+          "databaseConnectionString": {
+            "value": "[reference('linkedTemplate').outputs.databaseConnectionString.value]"
+          },
+          "databaseName": {
+            "value": "[parameters('databaseName')]"
+          },
+          "storageAccountName": {
+            "value": "[reference('linkedTemplate').outputs.storageAccountName.value]"
+          },
+          "storageConnectionString": {
+            "value": "[reference('linkedTemplate').outputs.storageConnectionString.value]"
+          }
+        }
+      }
+    }
+
+  ]
+}

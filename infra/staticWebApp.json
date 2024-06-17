@@ -1,0 +1,103 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "instanceName": {
+      "defaultValue": "rayven-app",
+      "type": "String"
+    },
+    "webSku": {
+      "type": "string",
+      "defaultValue": "Free",
+      "allowedValues": [ "Free", "Paid" ]
+    },
+    "customDomain": {
+      "defaultValue": "",
+      "type": "String"
+    },
+    "databaseAccountName": {
+      "type": "string"
+    },
+    "databaseName": {
+      "type": "string"
+    },
+    "databaseConnectionString": {
+      "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageConnectionString": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]",
+    "customUrl": "[concat('https://', variables('customDomainName'))]",
+    "storageDomainName": "[concat('z', variables('customDomainName'))]",
+    "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]",
+    "swaAppSettings": {
+      "type": "object",
+      "value": {
+        "ApiSettings__IsServerlessDb": "false",
+        "ApiSettings__LogRequestHeaders": "false",
+        "ApiSettings__PrimarySuffix": "[variables('customDomainName')]",
+        "ApiSettings__PrimaryUrl": "[variables('customUrl')]",
+        "ApiSettings__RequireAcceptHeader": "false",
+        "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
+        "ApiSettings__StorageUrl": "[variables('storageUrl')]",
+        "OpenApi__HostNames": "",
+        "Rayven_PrimarySuffix": "[variables('customDomainName')]",
+        "Rayven_PrimaryUrl": "[variables('customUrl')]",
+        "Rayven__StorageUrl": "[variables('storageUrl')]",
+        "Rayven__StorageConnectionString": "[parameters('storageConnectionString')]",
+        "RepositoryOptions__CosmosConnectionString": "[parameters('databaseConnectionString')]",
+        "RepositoryOptions__DatabaseId": "[parameters('databaseName')]"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-12-01",
+      "name": "[parameters('instanceName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+
+      },
+      "properties": {
+
+      },
+      "sku": {
+        "name": "Free",
+        "tier": "Free"
+      },
+      "resources": [
+        {
+          "apiVersion": "2021-01-15",
+          "name": "appsettings",
+          "type": "config",
+          "location": "[resourceGroup().location]",
+          "properties": "[variables('swaAppSettings')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]",
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccountName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Web/staticSites/basicAuth",
+      "apiVersion": "2023-12-01",
+      "name": "[concat(parameters('instanceName'), '/default')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
+      "properties": {
+        "applicableEnvironmentsMode": "SpecifiedEnvironments"
+      }
+    }
+  ]
+}
