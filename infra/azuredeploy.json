@@ -71,7 +71,7 @@
             "value": "[parameters('databaseSku')]"
           }
         }
-      }
+      }      
     },
     {
       "name": "storageTemplate",
@@ -124,7 +124,13 @@
             "value": "[reference('storageTemplate').outputs.storageConnectionString.value]"
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[reference('storageTemplate').outputs.storageAccountName.value]",
+        "[reference('storageTemplate').outputs.storageConnectionString.value]",
+        "[reference('databaseTemplate').outputs.databaseAccountName.value]",
+        "[reference('databaseTemplate').outputs.databaseConnectionString.value]"
+      ]
     }
 
   ],

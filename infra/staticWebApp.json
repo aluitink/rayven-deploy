@@ -80,9 +80,7 @@
           "location": "[resourceGroup().location]",
           "properties": "[variables('swaAppSettings')]",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]",
-            "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccountName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
           ]
         }
       ]
