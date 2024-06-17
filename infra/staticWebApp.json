@@ -37,7 +37,6 @@
     "storageDomainName": "[concat('z', variables('customDomainName'))]",
     "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]",
     "swaAppSettings": {
-      "type": "object",
       "value": {
         "ApiSettings__IsServerlessDb": "false",
         "ApiSettings__LogRequestHeaders": "false",

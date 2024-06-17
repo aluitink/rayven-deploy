@@ -52,7 +52,7 @@
   },
   "resources": [
     {
-      "name": "databaseTemplate",
+      "name": "Database",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "properties": {
@@ -74,7 +74,7 @@
       }      
     },
     {
-      "name": "storageTemplate",
+      "name": "Storage",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "properties": {
@@ -93,7 +93,7 @@
       }
     },
     {
-      "name": "staticWebAppTemplate",
+      "name": "WebApp",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "properties": {
@@ -109,27 +109,25 @@
             "value": "[parameters('webSku')]"
           },
           "databaseAccountName": {
-            "value": "[reference('databaseTemplate').outputs.databaseAccountName.value]"
+            "value": "[reference('Database').outputs.databaseAccountName.value]"
           },
           "databaseConnectionString": {
-            "value": "[reference('databaseTemplate').outputs.databaseConnectionString.value]"
+            "value": "[reference('Database').outputs.databaseConnectionString.value]"
           },
           "databaseName": {
             "value": "[parameters('databaseName')]"
           },
           "storageAccountName": {
-            "value": "[reference('storageTemplate').outputs.storageAccountName.value]"
+            "value": "[reference('Storage').outputs.storageAccountName.value]"
           },
           "storageConnectionString": {
-            "value": "[reference('storageTemplate').outputs.storageConnectionString.value]"
+            "value": "[reference('Storage').outputs.storageConnectionString.value]"
           }
         }
       },
       "dependsOn": [
-        "[reference('storageTemplate').outputs.storageAccountName.value]",
-        "[reference('storageTemplate').outputs.storageConnectionString.value]",
-        "[reference('databaseTemplate').outputs.databaseAccountName.value]",
-        "[reference('databaseTemplate').outputs.databaseConnectionString.value]"
+        "[resourceId('Microsoft.Resources/deployments', 'Storage')]",
+        "[resourceId('Microsoft.Resources/deployments', 'Database')]"
       ]
     }
 
