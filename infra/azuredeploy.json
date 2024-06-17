@@ -58,7 +58,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "relativePath": "./databaseAccount.json"
+          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/databaseAccount.json"
         },
         "parameters": {
           "instanceName": {
@@ -80,14 +80,11 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "relativePath": "./storageAccount.json"
+          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/storageAccount.json"
         },
         "parameters": {
           "instanceName": {
             "value": "[parameters('instanceName')]"
-          },
-          "storageAccountName": {
-            "value": "[variables('storageAccountName')]"
           },
           "storageAccountType": {
             "value": "[parameters('storageAccountType')]"
@@ -102,7 +99,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "relativePath": "./staticWebApp.json"
+          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/staticWebApp.json"
         },
         "parameters": {
           "instanceName": {
@@ -130,5 +127,11 @@
       }
     }
 
-  ]
+  ],
+  "outputs": {
+    "deploymentObject": {
+      "type": "object",
+      "value": "[deployment()]"
+    }
+  }
 }

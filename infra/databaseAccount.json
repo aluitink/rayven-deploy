@@ -81,7 +81,7 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
 			"apiVersion": "2024-05-15",
-			"name": "[concat(variables('databaseAccountName'), '/', parameters('databaseName')]",
+			"name": "[concat(variables('databaseAccountName'), '/', parameters('databaseName'))]",
 			"dependsOn": [
 				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountName'))]"
 			],
