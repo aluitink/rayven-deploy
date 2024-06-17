@@ -58,7 +58,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "relativePath": "databaseAccount.json"
+          "relativePath": "./databaseAccount.json"
         },
         "parameters": {
           "instanceName": {
@@ -80,7 +80,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "relativePath": "storageAccount.json"
+          "relativePath": "./storageAccount.json"
         },
         "parameters": {
           "instanceName": {
@@ -102,7 +102,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "relativePath": "staticWebApp.json"
+          "relativePath": "./staticWebApp.json"
         },
         "parameters": {
           "instanceName": {
