@@ -35,25 +35,7 @@
     "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]",
     "customUrl": "[concat('https://', variables('customDomainName'))]",
     "storageDomainName": "[concat('z', variables('customDomainName'))]",
-    "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]",
-    "swaAppSettings": {
-      "value": {
-        "ApiSettings__IsServerlessDb": "false",
-        "ApiSettings__LogRequestHeaders": "false",
-        "ApiSettings__PrimarySuffix": "[variables('customDomainName')]",
-        "ApiSettings__PrimaryUrl": "[variables('customUrl')]",
-        "ApiSettings__RequireAcceptHeader": "false",
-        "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
-        "ApiSettings__StorageUrl": "[variables('storageUrl')]",
-        "OpenApi__HostNames": "",
-        "Rayven_PrimarySuffix": "[variables('customDomainName')]",
-        "Rayven_PrimaryUrl": "[variables('customUrl')]",
-        "Rayven__StorageUrl": "[variables('storageUrl')]",
-        "Rayven__StorageConnectionString": "[parameters('storageConnectionString')]",
-        "RepositoryOptions__CosmosConnectionString": "[parameters('databaseConnectionString')]",
-        "RepositoryOptions__DatabaseId": "[parameters('databaseName')]"
-      }
-    }
+    "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]"
   },
   "resources": [
     {
@@ -73,11 +55,26 @@
       },
       "resources": [
         {
-          "apiVersion": "2021-01-15",
+          "apiVersion": "2022-09-01",
           "name": "appsettings",
           "type": "config",
           "location": "[resourceGroup().location]",
-          "properties": "[variables('swaAppSettings')]",
+          "properties": {
+            "ApiSettings__IsServerlessDb": "false",
+            "ApiSettings__LogRequestHeaders": "false",
+            "ApiSettings__PrimarySuffix": "[variables('customDomainName')]",
+            "ApiSettings__PrimaryUrl": "[variables('customUrl')]",
+            "ApiSettings__RequireAcceptHeader": "false",
+            "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
+            "ApiSettings__StorageUrl": "[variables('storageUrl')]",
+            "OpenApi__HostNames": "",
+            "Rayven_PrimarySuffix": "[variables('customDomainName')]",
+            "Rayven_PrimaryUrl": "[variables('customUrl')]",
+            "Rayven__StorageUrl": "[variables('storageUrl')]",
+            "Rayven__StorageConnectionString": "[parameters('storageConnectionString')]",
+            "RepositoryOptions__CosmosConnectionString": "[parameters('databaseConnectionString')]",
+            "RepositoryOptions__DatabaseId": "[parameters('databaseName')]"
+          },
           "dependsOn": [
             "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
           ]

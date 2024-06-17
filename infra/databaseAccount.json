@@ -14,6 +14,7 @@
 	},
 	"variables": {
 		"databaseAccountName": "[concat(parameters('instanceName'), '-db')]",
+		"databaseConnectionStringFmt": "[concat('AccountEndpoint=', reference(variables('databaseAccountName')).documentEndpoint, ';AccountKey={0}')]",
 		"databaseIsFreeTier": "[equals(parameters('databaseSku'), 'Free')]"
 	},
 	"resources": [
@@ -223,7 +224,7 @@
 	"outputs": {
 		"databaseConnectionString": {
 			"type": "string",
-			"value": ""
+			"value": "[format(variables('databaseConnectionStringFmt'), listKeys(variables('databaseAccountName')).primaryMasterKey)]"
 		},
 		"databaseAccountName": {
 			"type": "string",
