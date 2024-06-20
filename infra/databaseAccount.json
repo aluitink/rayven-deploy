@@ -10,13 +10,20 @@
 			"type": "string"
 		},
 		"databaseSku": {
-			"type": "string"
+			"type": "string",
+			"allowedValues": [ "Free", "Serverless", "Provisioned" ]
+		},
+		"databaseThroughputLimit": {
+			"type": "int",
+			"minValue": 400,
+			"defaultValue": 1000
 		}
 	},
 	"variables": {
 		"databaseAccountName": "[concat(parameters('instanceName'), '-db')]",
 		"databaseConnectionStringFmt": "AccountEndpoint={0};AccountKey={1};",
-		"databaseIsFreeTier": "[equals(parameters('databaseSku'), 'Free')]"
+		"databaseIsFreeTier": "[equals(parameters('databaseSku'), 'Free')]",
+		"databaseCapabilities": "[array(if(equals(parameters('databaseSku'), 'Serverless'), createObject('name', 'EnableServerless'), null()))]"
 	},
 	"resources": [
 		{
@@ -64,7 +71,7 @@
 					}
 				],
 				"cors": [],
-				"capabilities": [],
+				"capabilities": "[variables('databaseCapabilities')]",
 				"ipRules": [],
 				"backupPolicy": {
 					"type": "Periodic",
@@ -76,7 +83,7 @@
 				},
 				"networkAclBypassResourceIds": [],
 				"capacity": {
-					"totalThroughputLimit": 1000
+					"totalThroughputLimit": "[paramters('databaseThroughputLimit')]"
 				}
 			}
 		},
@@ -217,7 +224,8 @@
 			],
 			"properties": {
 				"resource": {
-					"throughput": 1000
+					"throughput": "[paramters('databaseThroughputLimit')]"
+
 				}
 			}
 		}

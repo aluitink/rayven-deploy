@@ -9,7 +9,7 @@
     "webSku": {
       "type": "string",
       "defaultValue": "Free",
-      "allowedValues": [ "Free", "Paid" ]
+      "allowedValues": [ "Free", "Standard" ]
     },
     "customDomain": {
       "defaultValue": "domain.tdl",
@@ -29,12 +29,15 @@
     },
     "storageConnectionString": {
       "type": "string"
+    },
+    "managedIdentityResourceId": {
+      "type": "string"
     }
   },
   "variables": {
     "customUrl": "[concat('https://', parameters('customDomain'))]",
     "storageDomainName": "[concat('z', parameters('customDomain'))]",
-    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]"
+    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]",
   },
   "resources": [
     {
@@ -52,6 +55,11 @@
         "name": "Free",
         "tier": "Free"
       },
+      "identity": {
+        "userAssignedIdentities": {
+          "[paramters('managedIdentityResourceId')]": {}
+        }
+      },
       "resources": [
         {
           "apiVersion": "2022-09-01",
@@ -59,6 +67,8 @@
           "type": "config",
           "location": "[resourceGroup().location]",
           "properties": {
+            "ApiSettings__ManagedIdentityId": "[paramters('managedIdentityResourceId')]",
+            "ApiSettings__AzureDeploymentToken": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]",
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
             "ApiSettings__PrimarySuffix": "[parameters('customDomain')]",

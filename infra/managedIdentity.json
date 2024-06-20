@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "instanceName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "identityName": "[parameters('instanceName')]-identity"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2018-11-30",
+      "location": "[resourceGroup().location]",
+      "name": "[variables('identityName')]"
+    }
+  ],
+  "outputs": {
+    "managedIdentityResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]"
+    }
+  }
+}

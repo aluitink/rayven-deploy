@@ -18,7 +18,14 @@
     "databaseSku": {
       "type": "string",
       "defaultValue": "Free",
-      "allowedValues": [ "Free", "Pay as you go" ]
+      "allowedValues": [ "Free", "Serverless", "Provisioned" ],
+      "metadata": {
+        "description": "With Azure Cosmos DB free tier, you will get the first 1000 RU/s and 25 GB of storage for free in an account. You can enable free tier on up to one account per subscription. Estimated $64/month discount per account."
+      },
+    "databaseThroughputLimit": {
+      "type": "int",
+      "minValue": 400,
+      "defaultValue": 1000
     },
     "customDomain": {
       "defaultValue": "domain.tdl",
@@ -42,14 +49,6 @@
       }
     }
   },
-  "variables": {
-    "databaseIsFreeTier": "[equals(parameters('databaseSku'), 'Free')]",
-    "storageAccountName": "[format('rayven{0}', uniqueString(resourceGroup().id))]",
-    "customDomainName": "[concat(parameters('instanceName'), '/', parameters('customDomain'))]",
-    "customUrl": "[concat('https://', variables('customDomainName'))]",
-    "storageDomainName": "[concat('z', variables('customDomainName'))]",
-    "storageUrl": "[concat('https://', 's.', variables('customDomainName'))]"
-  },
   "resources": [
     {
       "name": "Database",
@@ -69,9 +68,28 @@
           },
           "databaseSku": {
             "value": "[parameters('databaseSku')]"
+          },
+          "databaseThroughputLimit": {
+            "value": "[parameters('databaseThroughputLimit')]"
           }
         }
-      }      
+      }
+    },
+    {
+      "name": "Identity",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/managedIdentity.json"
+        },
+        "parameters": {
+          "instanceName": {
+            "value": "[parameters('instanceName')]"
+          }
+        }
+      }
     },
     {
       "name": "Storage",
@@ -122,10 +140,14 @@
           },
           "storageConnectionString": {
             "value": "[reference('Storage').outputs.storageConnectionString.value]"
+          },
+          "managedIdentityResourceId": {
+            "value": "[reference('Identity').outputs.managedIdentityResourceId.value]"
           }
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Identity')]",
         "[resourceId('Microsoft.Resources/deployments', 'Storage')]",
         "[resourceId('Microsoft.Resources/deployments', 'Database')]"
       ]
