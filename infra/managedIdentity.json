@@ -7,7 +7,7 @@
     }
   },
   "variables": {
-    "identityName": "[parameters('instanceName')]-identity"
+    "identityName": "[concat(parameters('instanceName'), '-identity')]"
   },
   "resources": [
     {
@@ -15,6 +15,19 @@
       "apiVersion": "2018-11-30",
       "location": "[resourceGroup().location]",
       "name": "[variables('identityName')]"
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2020-04-01-preview",
+      "name": "[guid(resourceGroup().id, variables('identityName'), 'ApplicationAdministratorRole')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f1a07417-d97a-45cb-824c-7a7467783830')]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName')), '2018-11-30').principalId]",
+        "scope": "[subscription().id]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]"
+      ]
     }
   ],
   "outputs": {

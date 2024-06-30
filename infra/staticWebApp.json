@@ -37,7 +37,7 @@
   "variables": {
     "customUrl": "[concat('https://', parameters('customDomain'))]",
     "storageDomainName": "[concat('z', parameters('customDomain'))]",
-    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]",
+    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]"
   },
   "resources": [
     {
@@ -56,8 +56,9 @@
         "tier": "Free"
       },
       "identity": {
+        "type": "UserAssigned",
         "userAssignedIdentities": {
-          "[paramters('managedIdentityResourceId')]": {}
+          "[parameters('managedIdentityResourceId')]": {}
         }
       },
       "resources": [
@@ -67,7 +68,7 @@
           "type": "config",
           "location": "[resourceGroup().location]",
           "properties": {
-            "ApiSettings__ManagedIdentityId": "[paramters('managedIdentityResourceId')]",
+            "ApiSettings__ManagedIdentityId": "[parameters('managedIdentityResourceId')]",
             "ApiSettings__AzureDeploymentToken": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]",
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
