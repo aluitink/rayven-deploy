@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -19,7 +20,16 @@ namespace rayven_deploy
         {
             _logger = logger;
         }
-
+        public static string AssemblyDirectory
+        {
+            get
+            {
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
+            }
+        }
         [Function("Function1")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
         {
@@ -49,6 +59,7 @@ namespace rayven_deploy
             var fileName = IsLinux() ? "StaticSitesClient" : "StaticSitesClient-Win.exe";
             ProcessStartInfo info = new ProcessStartInfo
             {
+                WorkingDirectory = AssemblyDirectory,
                 FileName = fileName,
                 Arguments = "upload --help",
                 WindowStyle = ProcessWindowStyle.Minimized,
