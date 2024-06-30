@@ -57,9 +57,15 @@ namespace rayven_deploy
             //    await downloadedFile.CopyToAsync(fs);
             //}
             var fileName = IsLinux() ? "StaticSitesClient" : "StaticSitesClient-Win.exe";
+
+            if (IsLinux())
+            {
+                File.SetUnixFileMode(fileName, UnixFileMode.OtherExecute);
+            }
+
             ProcessStartInfo info = new ProcessStartInfo
             {
-                WorkingDirectory = AssemblyDirectory,
+                //WorkingDirectory = AssemblyDirectory,
                 FileName = fileName,
                 Arguments = "upload --help",
                 WindowStyle = ProcessWindowStyle.Minimized,
