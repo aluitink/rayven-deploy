@@ -47,12 +47,30 @@ namespace rayven_deploy
                 await downloadedFile.CopyToAsync(fs);
             }
 
-            var process = Process.Start(staticSitesClient, "upload --help");
-            var sb = new StringBuilder();
-            process.OutputDataReceived += (sender, args) => {
-                sb.AppendLine(args.Data);
+            ProcessStartInfo info = new ProcessStartInfo
+            {
+                FileName = staticSitesClient,
+                Arguments = "upload --help",
+                WindowStyle = ProcessWindowStyle.Minimized,
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
-            process.WaitForExit();
+
+            Process proc = new Process
+            {
+                StartInfo = info
+            };
+            var sb = new StringBuilder();
+            proc.Refresh();
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.Start();
+
+            while (!proc.StandardOutput.EndOfStream)
+            {
+                sb.AppendLine(proc.StandardOutput.ReadLine());
+            }
+
+            proc.WaitForExit();
 
             _logger.LogInformation(sb.ToString());
 
