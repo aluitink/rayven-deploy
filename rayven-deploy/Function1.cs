@@ -51,22 +51,26 @@ namespace rayven_deploy
             var downloadedFile = await client.GetStreamAsync(dlPath);
             var fileName = IsLinux() ? "StaticSitesClient" : "StaticSitesClient-Win.exe";
             var staticSitesClientFilePath = Path.Join(tempPath, fileName);
+            _logger.LogInformation($"The file path is: {staticSitesClientFilePath}");
+
             if (File.Exists(staticSitesClientFilePath))
                 File.Delete(staticSitesClientFilePath);
             using (var fs = new FileStream(staticSitesClientFilePath, FileMode.CreateNew))
             {
                 await downloadedFile.CopyToAsync(fs);
+                await fs.FlushAsync();
             }
-            
+
+            _logger.LogInformation("The file was created");
 
             if (IsLinux())
             {
-                File.SetUnixFileMode(staticSitesClientFilePath, UnixFileMode.OtherExecute);
+                File.SetUnixFileMode(staticSitesClientFilePath, UnixFileMode.OtherExecute | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.UserRead | UnixFileMode.GroupRead);
             }
 
             ProcessStartInfo info = new ProcessStartInfo
             {
-                //WorkingDirectory = AssemblyDirectory,
+                WorkingDirectory = tempPath,
                 FileName = staticSitesClientFilePath,
                 Arguments = "upload --help",
                 WindowStyle = ProcessWindowStyle.Minimized,
