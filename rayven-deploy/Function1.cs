@@ -54,9 +54,9 @@ namespace rayven_deploy
             };
             process.WaitForExit();
 
-            _logger.LogDebug(sb.ToString());
+            _logger.LogInformation(sb.ToString());
 
-            return new OkObjectResult(sb.ToString());
+            return new OkObjectResult("Exeucted");
         }
     }
 }
