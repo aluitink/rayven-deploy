@@ -8,6 +8,18 @@
     <RootNamespace>rayven_deploy</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="StaticSitesClient" />
+    <None Remove="StaticSitesClient-Win.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="StaticSitesClient">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StaticSitesClient-Win.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.1.0" />
