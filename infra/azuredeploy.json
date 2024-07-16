@@ -142,7 +142,6 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'Identity')]",
         "[resourceId('Microsoft.Resources/deployments', 'Storage')]",
         "[resourceId('Microsoft.Resources/deployments', 'Database')]"
       ]
