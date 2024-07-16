@@ -88,9 +88,8 @@ $response = Send-DeploymentRequest -uri $apiUrl -token $deploymentToken -interva
 if ($null -ne $response) {
     $completedWorkflow = Poll-ForCompletion -uri $apiUrl -workflowRun $response -interval $pollingInterval
     Write-Output "Workflow has finished executing."
-
-    $DeploymentScriptOutputs = Extract-NonNullProperties -obj $completedWorkflow
-    Write-Output $DeploymentScriptOutputs
+    $DeploymentScriptOutputs = @{}
+    $DeploymentScriptOutputs['conclusion'] = $completedWorkflow.conclusion
 } else {
     Write-Output "Failed to receive a valid response from /api/Deploy."
 }
