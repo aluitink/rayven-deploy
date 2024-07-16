@@ -38,6 +38,7 @@ namespace rayven_deploy
     public class DeploymentRequest
     {
         public string DeploymentToken { get; set; }
+        public int MaxAttempts { get; set; }
     }
 
     public class Workflow
@@ -74,6 +75,54 @@ namespace rayven_deploy
 
     public class WorkflowRun
     {
+        public const string RunningStatus = "running";
+        public const string QueuedStatus = "queued";
+        public const string FailureStatus = "failure";
+        public const string CancelledStatus = "cancelled";
+        public const string CompletedStatus = "completed";
+        public const string ActionRequiredStatus = "action_required";
+        public const string NeutralStatus = "neutral";
+        public const string SkippedStatus = "skipped";
+        public const string StaleStatus = "stale";
+        public const string SuccessStatus = "success";
+        public const string TimeoutStatus = "time_out";
+        public const string InProgressStatus = "in_progress";
+        public const string RequestedStatus = "requested";
+        public const string WaitingStatus = "waiting";
+        public const string PendingStatus = "pending";
+
+        public static string[] ActiveStatuses =
+        [
+            RunningStatus,
+            QueuedStatus,
+            ActionRequiredStatus,
+            InProgressStatus,
+            RequestedStatus,
+            WaitingStatus,
+            PendingStatus
+        ];
+
+        public static string[] CompleteStatuses = 
+        [
+            FailureStatus,
+            CancelledStatus,
+            CompletedStatus,
+            NeutralStatus,
+            SkippedStatus,
+            StaleStatus,
+            SuccessStatus,
+            TimeoutStatus,
+        ];
+
+        public static string[] ErrorStatuses  =
+        [
+            FailureStatus,
+            CancelledStatus,
+            SkippedStatus,
+            StaleStatus,
+            TimeoutStatus,
+        ];
+
         [JsonPropertyName("id")]
         public long Id { get; set; }
         [JsonPropertyName("name")]
@@ -170,6 +219,14 @@ namespace rayven_deploy
             return workflowRuns?.WorkflowRuns.OrderByDescending(w => w.CreatedUtc).FirstOrDefault();
         }
 
+        protected async Task<WorkflowRun?> GetActiveWorkflowRunAsync(HttpClient client, long workflowId)
+        {
+            var workflowRunsUri = GitWorkflowRunsUri(_apiSettings.GithubRepositoryOwner, _apiSettings.GithubRepositoryName, workflowId);
+            var result = await client.GetStringAsync(workflowRunsUri);
+            var workflowRuns = await client.GetFromJsonAsync<WorkflowRunsCollectionResponse>(workflowRunsUri);
+            return workflowRuns?.WorkflowRuns.OrderByDescending(w => w.CreatedUtc).Where(w => WorkflowRun.ActiveStatuses.Contains(w.Status)).FirstOrDefault();
+        }
+
         public async Task<WorkflowRun?> GetWorkflowRunAsync(HttpClient client, long runId)
         {
             var workflowRunUri = GitWorkflowRunUri(_apiSettings.GithubRepositoryOwner, _apiSettings.GithubRepositoryName, runId);
@@ -180,7 +237,6 @@ namespace rayven_deploy
         {
             var workflowsUri = GitWorkflowDispatchUri(_apiSettings.GithubRepositoryOwner, _apiSettings.GithubRepositoryName, workflowId);
             var content = JsonContent.Create(new { @ref = _apiSettings.GithubRepositoryBranch, inputs = new { deploymentToken = deploymentToken } });
-
             var result = await client.PostAsync(workflowsUri, content, cancellationToken);
             result.EnsureSuccessStatusCode();
         }
@@ -198,9 +254,24 @@ namespace rayven_deploy
                 if (workflow == null)
                     return new NotFoundObjectResult("Unable to locate workflow");
 
+                var activeWorkflowRun = await GetActiveWorkflowRunAsync(client, workflow.Id);
+                if (activeWorkflowRun != null)
+                    return new ConflictObjectResult("An active deployment is in progress, please try again shortly...");
+
                 await RunWorkflowAsync(client, workflow.Id, deploymentRequest.DeploymentToken);
-                var workflowRun = await GetLastWorkflowRunAsync(client, workflow.Id);
-                return new OkObjectResult(workflowRun);
+
+                int attempt = 0;
+                do
+                {
+                    attempt++;
+                    activeWorkflowRun = await GetActiveWorkflowRunAsync(client, workflow.Id);
+                    // backoff
+                    await Task.Delay(TimeSpan.FromSeconds(attempt * 2));
+                }
+                while (activeWorkflowRun == null && attempt < deploymentRequest.MaxAttempts);
+                if (activeWorkflowRun == null)
+                    return new BadRequestObjectResult("Unable to locate active workflow run");
+                return new OkObjectResult(activeWorkflowRun);
             }
         }
         [Function("Status")]

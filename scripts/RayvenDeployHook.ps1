@@ -2,22 +2,40 @@ param (
     [string]$deploymentToken,
     [string]$apiUrl = "http://localhost:7093",
     [int]$pollingInterval = 10  # Default polling interval set to 10 seconds
+    [int]$maxAttempts = 3
 )
 
 function Send-DeploymentRequest {
     param (
         [string]$uri,
-        [string]$token
+        [string]$token,
+        [int]$interval,
+        [int]$attempts
     )
 
     $deploymentRequest = @{
         DeploymentToken = $token
+        MaxAttempts = $attempts
     }
 
     $jsonDeploymentRequest = $deploymentRequest | ConvertTo-Json
-    $response = Invoke-RestMethod -Uri "$uri/api/Deploy" -Method Post -Body $jsonDeploymentRequest -ContentType "application/json"
-    return $response
+
+    do {
+        try {
+            $response = Invoke-RestMethod -Uri "$uri/api/Deploy" -Method Post -Body $jsonDeploymentRequest -ContentType "application/json" -ErrorAction Stop
+            return $response
+        } catch [System.Net.WebException] {
+            $statusCode = $_.Exception.Response.StatusCode
+            if ($statusCode -eq 409) {
+                Write-Output "Received 409 Conflict. Retrying in $interval seconds..."
+                Start-Sleep -Seconds $interval
+            } else {
+                throw $_
+            }
+        }
+    } while ($true)
 }
+
 
 function Get-WorkflowStatus {
     param (
@@ -65,7 +83,7 @@ function Extract-NonNullProperties {
 }
 
 # Main script logic
-$response = Send-DeploymentRequest -uri $apiUrl -token $deploymentToken
+$response = Send-DeploymentRequest -uri $apiUrl -token $deploymentToken -interval $pollingInterval -attempts $maxAttempts
 
 if ($null -ne $response) {
     $completedWorkflow = Poll-ForCompletion -uri $apiUrl -workflowRun $response -interval $pollingInterval
