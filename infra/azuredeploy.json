@@ -138,9 +138,6 @@
           },
           "storageConnectionString": {
             "value": "[reference('Storage').outputs.storageConnectionString.value]"
-          },
-          "managedIdentityResourceId": {
-            "value": "[reference('Identity').outputs.managedIdentityResourceId.value]"
           }
         }
       },
