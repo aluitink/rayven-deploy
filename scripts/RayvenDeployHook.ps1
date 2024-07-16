@@ -1,7 +1,7 @@
 param (
     [string]$deploymentToken,
     [string]$apiUrl = "http://localhost:7093",
-    [int]$pollingInterval = 10  # Default polling interval set to 10 seconds
+    [int]$pollingInterval = 10,  # Default polling interval set to 10 seconds
     [int]$maxAttempts = 3
 )
 
