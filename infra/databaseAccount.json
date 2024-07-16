@@ -23,7 +23,8 @@
 		"databaseAccountName": "[concat(parameters('instanceName'), '-db')]",
 		"databaseConnectionStringFmt": "AccountEndpoint={0};AccountKey={1};",
 		"databaseIsFreeTier": "[equals(parameters('databaseSku'), 'Free')]",
-		"databaseCapabilities": "[array(if(equals(parameters('databaseSku'), 'Serverless'), createObject('name', 'EnableServerless'), null()))]"
+		"databaseCapabilities": "[array(if(equals(parameters('databaseSku'), 'Serverless'), createObject('name', 'EnableServerless'), null()))]",
+		"databaseHasBurstCapacity": "[array(if(equals(parameters('databaseSku'), 'Serverless'), false(), true()))]"
 	},
 	"resources": [
 		{
@@ -57,7 +58,7 @@
 				"networkAclBypass": "None",
 				"disableLocalAuth": false,
 				"enablePartitionMerge": false,
-				"enableBurstCapacity": true,
+				"enableBurstCapacity": "[variables('databaseHasBurstCapacity')]",
 				"minimalTlsVersion": "Tls12",
 				"consistencyPolicy": {
 					"defaultConsistencyLevel": "Session",
