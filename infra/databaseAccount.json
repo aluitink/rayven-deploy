@@ -219,6 +219,7 @@
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings",
 			"apiVersion": "2024-05-15",
 			"name": "[concat(variables('databaseAccountName'), '/', parameters('databaseName'), '/objects/default')]",
+			"condition": "[if(equals(parameters('databaseSku'), 'Serverless'), false(), true())]",
 			"dependsOn": [
 				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', variables('databaseAccountName'), parameters('databaseName'), 'objects')]",
 				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('databaseAccountName'), parameters('databaseName'))]",
