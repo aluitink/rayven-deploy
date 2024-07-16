@@ -29,9 +29,6 @@
     },
     "storageConnectionString": {
       "type": "string"
-    },
-    "managedIdentityResourceId": {
-      "type": "string"
     }
   },
   "variables": {
@@ -55,12 +52,6 @@
         "name": "Free",
         "tier": "Free"
       },
-      "identity": {
-        "type": "UserAssigned",
-        "userAssignedIdentities": {
-          "[parameters('managedIdentityResourceId')]": {}
-        }
-      },
       "resources": [
         {
           "apiVersion": "2022-09-01",
@@ -68,7 +59,6 @@
           "type": "config",
           "location": "[resourceGroup().location]",
           "properties": {
-            "ApiSettings__ManagedIdentityId": "[parameters('managedIdentityResourceId')]",
             "ApiSettings__AzureDeploymentToken": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]",
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
