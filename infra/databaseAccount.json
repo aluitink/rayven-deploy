@@ -84,7 +84,7 @@
 				},
 				"networkAclBypassResourceIds": [],
 				"capacity": {
-					"totalThroughputLimit": "[paramters('databaseThroughputLimit')]"
+					"totalThroughputLimit": "[parameters('databaseThroughputLimit')]"
 				}
 			}
 		},
@@ -225,7 +225,7 @@
 			],
 			"properties": {
 				"resource": {
-					"throughput": "[paramters('databaseThroughputLimit')]"
+					"throughput": "[parameters('databaseThroughputLimit')]"
 
 				}
 			}
