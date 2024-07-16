@@ -32,6 +32,7 @@
 			"name": "[variables('databaseAccountName')]",
 			"location": "[resourceGroup().location]",
 			"tags": {
+				"rayven-db": "1.0",
 				"defaultExperience": "Core (SQL)",
 				"hidden-cosmos-mmspecial": ""
 			},

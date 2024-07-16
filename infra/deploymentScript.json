@@ -2,28 +2,11 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-		"owner": {
-			"type": "string",
-			"defaultValue": "aluitink"
-		},
-		"repo": {
-			"type": "string",
-			"defaultValue": "Rayven"
-		},
-		"token": {
-			"type": "securestring",
-			"defaultValue": ""
-		},
 		"deploymentToken": {
 			"type": "securestring"
 		},
-		"workflowPath": {
-			"type": "string",
-			"defaultValue": ".github/workflows/swa-deploy-webhook.yml"
-		},
-		"branch": {
-			"type": "string",
-			"defaultValue": "master"
+		"apiUrl": {
+			"type": "string"
 		},
 		"pollingInterval": {
 			"type": "int",
@@ -39,8 +22,8 @@
 			"kind": "AzurePowerShell",
 			"properties": {
 				"azPowerShellVersion": "8.3",
-				"primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/GitActionRunner.ps1",
-				"arguments": "[concat('-owner ', parameters('owner'), ' -repo ', parameters('repo'), ' -token ', parameters('token'), ' -deploymentToken ', parameters('deploymentToken'), ' -workflowPath ', parameters('workflowPath'), ' -branch ', parameters('branch'), ' -pollingInterval ', parameters('pollingInterval'))]",
+				"primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/RayvenDeployHook.ps1",
+				"arguments": "[concat(' -deploymentToken ', parameters('deploymentToken'), ' -apiUrl ', parameters('apiUrl'),' -pollingInterval ', parameters('pollingInterval'))]",
 				"timeout": "PT1H",
 				"cleanupPreference": "OnSuccess",
 				"retentionInterval": "P1D"

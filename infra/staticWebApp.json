@@ -46,7 +46,7 @@
       "name": "[parameters('instanceName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-
+        "rayven-webapp": "1.0"
       },
       "properties": {
 
@@ -103,5 +103,11 @@
         "applicableEnvironmentsMode": "SpecifiedEnvironments"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "deploymentToken": {
+      "type": "string",
+      "value": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]"
+    }
+  }
 }

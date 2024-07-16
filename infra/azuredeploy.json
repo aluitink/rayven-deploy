@@ -6,6 +6,9 @@
       "defaultValue": "rayven",
       "type": "string"
     },
+    "deployApiUrl": {
+      "type": "string"
+    },
     "databaseName": {
       "type": "string",
       "defaultValue": "Rayven"
@@ -21,7 +24,8 @@
       "allowedValues": [ "Free", "Serverless", "Provisioned" ],
       "metadata": {
         "description": "With Azure Cosmos DB free tier, you will get the first 1000 RU/s and 25 GB of storage for free in an account. You can enable free tier on up to one account per subscription. Estimated $64/month discount per account."
-      },
+      }
+    },
     "databaseThroughputLimit": {
       "type": "int",
       "minValue": 400,
@@ -51,6 +55,16 @@
   },
   "resources": [
     {
+      "type": "Microsoft.Resources/tags",
+      "name": "default",
+      "apiVersion": "2021-04-01",
+      "properties": {
+        "tags": {
+          "rayven": "1.0"
+        }
+      }
+    },
+    {
       "name": "Database",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
@@ -71,22 +85,6 @@
           },
           "databaseThroughputLimit": {
             "value": "[parameters('databaseThroughputLimit')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "Identity",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/managedIdentity.json"
-        },
-        "parameters": {
-          "instanceName": {
-            "value": "[parameters('instanceName')]"
           }
         }
       }
@@ -151,8 +149,29 @@
         "[resourceId('Microsoft.Resources/deployments', 'Storage')]",
         "[resourceId('Microsoft.Resources/deployments', 'Database')]"
       ]
+    },
+    {
+      "name": "ApplicationDeployment",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/deploymentScript.json"
+        },
+        "parameters": {
+          "apiUrl": {
+            "value": "[parameters('deployApiUrl')]"
+          },
+          "deploymentToken": {
+            "value": "[reference('WebApp').outputs.deploymentToken.value]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'WebApp')]"
+      ]
     }
-
   ],
   "outputs": {
     "deploymentObject": {

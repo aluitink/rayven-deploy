@@ -35,6 +35,9 @@
       "apiVersion": "2022-09-01",
       "name": "[variables('storageAccountName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "rayven-storage": "1.0"
+      },
       "sku": {
         "name": "[parameters('storageAccountType')]"
       },
