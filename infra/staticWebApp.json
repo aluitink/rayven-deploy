@@ -34,7 +34,8 @@
   "variables": {
     "customUrl": "[concat('https://', parameters('customDomain'))]",
     "storageDomainName": "[concat('z', parameters('customDomain'))]",
-    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]"
+    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]",
+    "defaultHostname": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]"
   },
   "resources": [
     {
@@ -62,16 +63,12 @@
             "ApiSettings__AzureDeploymentToken": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]",
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
-            "ApiSettings__PrimarySuffix": "[parameters('customDomain')]",
-            "ApiSettings__PrimaryUrl": "[variables('customUrl')]",
+            "ApiSettings__PrimarySuffix": "[variables('defaultHostname')]",
+            "ApiSettings__PrimaryUrl": "[concat('https://', variables('defaultHostname'))]",
             "ApiSettings__RequireAcceptHeader": "false",
             "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
             "ApiSettings__StorageUrl": "[variables('storageUrl')]",
             "OpenApi__HostNames": "",
-            "Rayven_PrimarySuffix": "[parameters('customDomain')]",
-            "Rayven_PrimaryUrl": "[variables('customUrl')]",
-            "Rayven__StorageUrl": "[variables('storageUrl')]",
-            "Rayven__StorageConnectionString": "[parameters('storageConnectionString')]",
             "RepositoryOptions__CosmosConnectionString": "[parameters('databaseConnectionString')]",
             "RepositoryOptions__DatabaseId": "[parameters('databaseName')]"
           },
@@ -98,6 +95,10 @@
     "deploymentToken": {
       "type": "string",
       "value": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]"
+    },
+    "webAppHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]"
     }
   }
 }
