@@ -34,8 +34,7 @@
   "variables": {
     "customUrl": "[concat('https://', parameters('customDomain'))]",
     "storageDomainName": "[concat('z', parameters('customDomain'))]",
-    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]",
-    "defaultHostname": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]"
+    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]"
   },
   "resources": [
     {
@@ -63,8 +62,8 @@
             "ApiSettings__AzureDeploymentToken": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]",
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
-            "ApiSettings__PrimarySuffix": "[variables('defaultHostname')]",
-            "ApiSettings__PrimaryUrl": "[concat('https://', variables('defaultHostname'))]",
+            "ApiSettings__PrimarySuffix": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]",
+            "ApiSettings__PrimaryUrl": "[concat('https://', [reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname])]",
             "ApiSettings__RequireAcceptHeader": "false",
             "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
             "ApiSettings__StorageUrl": "[variables('storageUrl')]",
