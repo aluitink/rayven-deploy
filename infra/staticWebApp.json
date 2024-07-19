@@ -63,7 +63,7 @@
             "ApiSettings__IsServerlessDb": "false",
             "ApiSettings__LogRequestHeaders": "false",
             "ApiSettings__PrimarySuffix": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]",
-            "ApiSettings__PrimaryUrl": "[concat('https://', [reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname])]",
+            "ApiSettings__PrimaryUrl": "[concat('https://', reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname)]",
             "ApiSettings__RequireAcceptHeader": "false",
             "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
             "ApiSettings__StorageUrl": "[variables('storageUrl')]",
