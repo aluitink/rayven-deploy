@@ -3,7 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using rayven_deploy;
+using Rayven.Deploy.App.Models;
+using Rayven.Deploy.App.Providers.GitHub;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
@@ -21,15 +22,18 @@ var host = new HostBuilder()
             if (!string.IsNullOrWhiteSpace(apiSettings.GithubAccessToken))
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiSettings.GithubAccessToken}");
         });
+        services.AddTransient((sp) =>
+        {
+            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+            var apiOptions = sp.GetRequiredService<IOptions<ApiSettings>>();
+            var apiSettings = apiOptions.Value;
+            var gitHubHttpClient = httpClientFactory.CreateClient("github");
+            return new GitHubWorkflowProvider(apiSettings.GithubRepositoryOwner, apiSettings.GithubRepositoryName, apiSettings.GithubWorkflowPath, gitHubHttpClient);
+        });
         services.AddOptions<ApiSettings>()
             .Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection("ApiSettings").Bind(settings);
-            });
-        services.AddOptions<AuthenticationSettings>()
-            .Configure<IConfiguration>((settings, configuration) =>
-            {
-                configuration.GetSection("AuthenticationSettings").Bind(settings);
             });
     })
     .Build();
