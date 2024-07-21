@@ -89,14 +89,14 @@ namespace Rayven.Deploy.App.Models
 
             var zoneResource = _apiSettings.DnsZoneResourceId;
             if (!ResourceIdentifier.TryParse(zoneResource, out var resourceIdentifier))
-                return new BadRequestResult();
+                return new BadRequestObjectResult("Unable to parse: '_apiSettings.DnsZoneResourceId'");
 
             var resourceGroup = await subscription.GetResourceGroupAsync(resourceIdentifier.ResourceGroupName);
             var dnsZones = resourceGroup.Value.GetDnsZones();
             var myZone = dnsZones.FirstOrDefault(z => z.Id.Equals(resourceIdentifier));
 
             if (myZone == null)
-                return new BadRequestResult();
+                return new BadRequestObjectResult($"Unable to find DnsZone resource: '{_apiSettings.DnsZoneResourceId}'");
 
             var newCname = new DnsCnameRecordData()
             {
