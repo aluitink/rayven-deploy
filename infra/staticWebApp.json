@@ -26,9 +26,6 @@
       "type": "string",
       "defaultValue": "rvn.world"
     },
-    "customDnsName": {
-      "type": "string"
-    },
     "databaseAccountName": {
       "type": "string"
     },

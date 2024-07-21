@@ -40,11 +40,10 @@
       "minValue": 400,
       "defaultValue": 1000
     },
-    "customSubDomain": {
-      "defaultValue": "[uniqueString(resourceGroup().id)]",
+    "subDomainName": {
       "type": "string",
       "metadata": {
-        "description": "Select a sub-domain in the rvn.world zone"
+        "description": "Select a sub-domain in the rvn.world zone (example.rvn.world)"
       }
     },
     "storageAccountType": {
@@ -160,8 +159,11 @@
           "storageConnectionString": {
             "value": "[reference('Storage').outputs.storageConnectionString.value]"
           },
-          "customDnsName": {
-            "value": "[concat(parameters('customSubDomain'), parameters('rootDnsZone'))]"
+          "subDomainName": {
+            "value": "[parameters('subDomainName')]"
+          },
+          "rootDnsZone": {
+            "value": "[parameters('rootDnsZone')]"
           }
         }
       },
