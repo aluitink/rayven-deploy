@@ -28,8 +28,10 @@ function Send-DomainRequest {
     }
 
     try {
+        $requestUri 
+
         # Make the POST request
-        $response = Invoke-RestMethod -Uri $Uri -Method Post -Headers $headers -Body $jsonBody
+        $response = Invoke-RestMethod -Uri "$Uri/api/AddDomain" -Method Post -Headers $headers -Body $jsonBody
 
         # Output the response
         return $response
