@@ -7,10 +7,12 @@
       "type": "string"
     },
     "deployApiUrl": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "https://deploy.rayven.mx"
     },
     "deployApiKey": {
-      "type": "string"
+      "type": "securestring",
+      "defaultValue": "80D2C5D8-1514-4FCD-BD5A-E1EB953E8C7D"
     },
     "webSku": {
       "type": "string",
@@ -21,7 +23,8 @@
       "type": "string"
     },
     "rootDnsZone": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "rvn.world"
     },
     "customDnsName": {
       "type": "string"
@@ -66,52 +69,6 @@
       "sku": {
         "name": "Free",
         "tier": "Free"
-      }
-    },
-    {
-      "type": "Microsoft.Web/staticSites/basicAuth",
-      "apiVersion": "2023-12-01",
-      "name": "[concat(parameters('instanceName'), '/default')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
-      ],
-      "properties": {
-        "applicableEnvironmentsMode": "SpecifiedEnvironments"
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deploymentScripts",
-      "apiVersion": "2020-10-01",
-      "name": "RayvenCNAME",
-      "kind": "AzurePowerShell",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
-      ],
-      "properties": {
-        "azPowerShellVersion": "8.3",
-        "primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/RayvenAddDomain.ps1",
-        "arguments": "[concat(' -apiKey ', parameters('deployApiKey'), ' -apiUrl ', parameters('deployApiUrl'),' -subDomainName ', parameters('subDomainName'), ' -targetDomainName ', reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname))]",
-        "timeout": "PT1H",
-        "cleanupPreference": "OnSuccess",
-        "retentionInterval": "P1D"
-      }
-    },
-    {
-      "type": "Microsoft.Web/staticSites",
-      "apiVersion": "2023-12-01",
-      "name": "[concat(parameters('instanceName'), '/settings')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "rayven-webapp": "1.0"
-      },
-      "properties": {
-
-      },
-      "sku": {
-        "name": "Free",
-        "tier": "Free"
       },
       "resources": [
         {
@@ -142,6 +99,37 @@
       ]
     },
     {
+      "type": "Microsoft.Web/staticSites/basicAuth",
+      "apiVersion": "2023-12-01",
+      "name": "[concat(parameters('instanceName'), '/default')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
+      "properties": {
+        "applicableEnvironmentsMode": "SpecifiedEnvironments"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2020-10-01",
+      "name": "RayvenCNAME",
+      "kind": "AzurePowerShell",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
+      "properties": {
+        "azPowerShellVersion": "8.3",
+        "primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/RayvenAddDomain.ps1",
+        "arguments": "[concat(' -apiKey ', parameters('deployApiKey'), ' -apiUrl ', parameters('deployApiUrl'),' -subDomainName ', parameters('subDomainName'), ' -targetDomainName ', reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname)]",
+        "timeout": "PT1H",
+        "cleanupPreference": "OnSuccess",
+        "retentionInterval": "P1D"
+      }
+    },
+    
+    {
       "type": "Microsoft.Web/staticSites/customDomains",
       "apiVersion": "2022-09-01",
       "name": "[concat(parameters('instanceName'), '/', variables('customDnsName'))]",
@@ -151,7 +139,7 @@
         "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
       ],
       "properties": {
-        "validationMethod": "cname"
+        "validationMethod": "cname-delegation"
       }
     }
   ],
