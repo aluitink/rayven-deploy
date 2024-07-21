@@ -1,0 +1,156 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "instanceName": {
+      "defaultValue": "rayven-app",
+      "type": "string"
+    },
+    "storageEndpoint": {
+      "type": "object"
+    }   
+  },
+  "variables": {
+    "storageHostname":  "[replace(replace(parameters('storageEndpoint').blob, 'https://', ''), '/', '')]",
+    "cdnEndpointName": "[format('rayven{0}-storage', parameters('instanceName')]",
+    "cdnName": "[format('rayven{0}-cdn', parameters('instanceName')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Cdn/profiles",
+      "apiVersion": "2024-02-01",
+      "name": "[variables('cdnName')]",
+      "location": "Global",
+      "tags": {
+        "rayven-cdn": "1.0"
+      },
+      "sku": {
+        "name": "Standard_Microsoft"
+      },
+      "kind": "cdn",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Cdn/profiles/endpoints",
+      "apiVersion": "2024-02-01",
+      "name": "[concat(variables('cdnName'), '/', variables('cdnEndpointName'))]",
+      "location": "Global",
+      "dependsOn": [
+        "[resourceId('Microsoft.Cdn/profiles', variables('cdnName'))]"
+      ],
+      "tags": {
+        "rayven-cdn-endpoint": ""
+      },
+      "properties": {
+        "originHostHeader": "[variables('storageHostname')]",
+        "contentTypesToCompress": [
+          "application/eot",
+          "application/font",
+          "application/font-sfnt",
+          "application/javascript",
+          "application/json",
+          "application/opentype",
+          "application/otf",
+          "application/pkcs7-mime",
+          "application/truetype",
+          "application/ttf",
+          "application/vnd.ms-fontobject",
+          "application/xhtml+xml",
+          "application/xml",
+          "application/xml+rss",
+          "application/x-font-opentype",
+          "application/x-font-truetype",
+          "application/x-font-ttf",
+          "application/x-httpd-cgi",
+          "application/x-javascript",
+          "application/x-mpegurl",
+          "application/x-opentype",
+          "application/x-otf",
+          "application/x-perl",
+          "application/x-ttf",
+          "font/eot",
+          "font/ttf",
+          "font/otf",
+          "font/opentype",
+          "image/svg+xml",
+          "text/css",
+          "text/csv",
+          "text/html",
+          "text/javascript",
+          "text/js",
+          "text/plain",
+          "text/richtext",
+          "text/tab-separated-values",
+          "text/xml",
+          "text/x-script",
+          "text/x-component",
+          "text/x-java-source"
+        ],
+        "isCompressionEnabled": true,
+        "isHttpAllowed": true,
+        "isHttpsAllowed": true,
+        "queryStringCachingBehavior": "UseQueryString",
+        "origins": [
+          {
+            "name": "devravenapp-blob-core-windows-net",
+            "properties": {
+              "hostName": "[variables('storageHostname')]",
+              "httpPort": 80,
+              "httpsPort": 443,
+              "originHostHeader": "[variables('storageHostname')]",
+              "priority": 1,
+              "weight": 1000,
+              "enabled": true
+            }
+          }
+        ],
+        "originGroups": [],
+        "geoFilters": []
+      }
+    },
+    {
+      "type": "Microsoft.Cdn/profiles/endpoints/customdomains",
+      "apiVersion": "2024-02-01",
+      "name": "[concat(variables('cdnName'), '/', variables('cdnEndpointName'), '/s-rayven-mx')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Cdn/profiles/endpoints', variables('cdnName'), variables('cdnEndpointName'))]",
+        "[resourceId('Microsoft.Cdn/profiles', variables('cdnName'))]"
+      ],
+      "properties": {
+        "hostName": "s.rayven.mx"
+      }
+    },
+    {
+      "type": "Microsoft.Cdn/profiles/endpoints/origins",
+      "apiVersion": "2024-02-01",
+      "name": "[concat(variables('cdnName'), '/', variables('cdnEndpointName'), '/devravenapp-blob-core-windows-net')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Cdn/profiles/endpoints', variables('cdnName'), variables('cdnEndpointName'))]",
+        "[resourceId('Microsoft.Cdn/profiles', variables('cdnName'))]"
+      ],
+      "properties": {
+        "hostName": "[variables('storageHostname')]",
+        "httpPort": 80,
+        "httpsPort": 443,
+        "originHostHeader": "[variables('storageHostname')]",
+        "priority": 1,
+        "weight": 1000,
+        "enabled": true
+      }
+    }
+  ],
+  "outputs": {
+    "storageConnectionString": {
+      "type": "string",
+      "value": "[format(variables('storageConnectionStringFmt'), listKeys(variables('stroageAccountResourceId'), '2022-09-01').keys[0].value)]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "storageHostname": {
+      "type": "string",
+      "value": "[variables('storageHostname')]"
+    }
+  }
+}

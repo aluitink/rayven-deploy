@@ -5,6 +5,16 @@ VisualStudioVersion = 17.10.34707.107
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "rayven-deploy", "rayven-deploy\rayven-deploy.csproj", "{74B5E86C-1A85-4130-936E-412AC52F5799}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{F2A09254-91CD-4310-8748-08E6A7218395}"
+	ProjectSection(SolutionItems) = preProject
+		infra\azuredeploy.json = infra\azuredeploy.json
+		infra\databaseAccount.json = infra\databaseAccount.json
+		infra\deploymentScript.json = infra\deploymentScript.json
+		infra\managedIdentity.json = infra\managedIdentity.json
+		infra\staticWebApp.json = infra\staticWebApp.json
+		infra\storageAccount.json = infra\storageAccount.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
