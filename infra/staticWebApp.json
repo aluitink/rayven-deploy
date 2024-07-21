@@ -89,7 +89,7 @@
             "RepositoryOptions__DatabaseId": "[parameters('databaseName')]"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Resources/deploymentScripts', 'RayvenCNAME')]",
+            "[resourceId('Microsoft.Resources/deployments', 'ApplicationSetup')]",
             "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
           ]
         }
@@ -108,31 +108,43 @@
       }
     },
     {
-      "type": "Microsoft.Resources/deploymentScripts",
-      "apiVersion": "2020-10-01",
-      "name": "RayvenCNAME",
-      "kind": "AzurePowerShell",
-      "location": "[resourceGroup().location]",
+      "name": "ApplicationSetup",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/deploymentScript.json"
+        },
+        "parameters": {
+          "deploymentToken": {
+            "value": ""
+          }
+          "deployApiUrl": {
+            "value": "[parameters('deployApiUrl')]"
+          },
+          "deployApiKey": {
+            "value": "[parameters('deployApiKey')]"
+          },
+          "subDomainName": {
+            "value": "[parameters('subDomainName')]"
+          },
+          "targetDomainName": {
+            "value": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]"
+          }
+        }
+      },
       "dependsOn": [
         "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
-      ],
-      "properties": {
-        "azPowerShellVersion": "8.3",
-        "primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/RayvenAddDomain.ps1",
-        "arguments": "[concat(' -apiKey ', parameters('deployApiKey'), ' -apiUrl ', parameters('deployApiUrl'),' -subDomainName ', parameters('subDomainName'), ' -targetDomainName ', reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname)]",
-        "timeout": "PT1H",
-        "cleanupPreference": "OnSuccess",
-        "retentionInterval": "P1D"
-      }
+      ]
     },
-    
     {
       "type": "Microsoft.Web/staticSites/customDomains",
       "apiVersion": "2022-09-01",
       "name": "[concat(parameters('instanceName'), '/', variables('customDnsName'))]",
       "kind": "string",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deploymentScripts', 'RayvenCNAME')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ApplicationSetup')]",
         "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
       ],
       "properties": {
@@ -141,17 +153,13 @@
     }
   ],
   "outputs": {
-    "deploymentToken": {
-      "type": "string",
-      "value": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]"
-    },
     "webAppHostName": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]"
     },
-    "customHostName": {
+    "customDnsName": {
       "type": "string",
-      "value": ""
+      "value": "variables('customDnsName')"
     }
   }
 }

@@ -5,7 +5,16 @@
 		"deploymentToken": {
 			"type": "securestring"
 		},
-		"apiUrl": {
+		"deployApiUrl": {
+			"type": "string"
+		},
+		"deployApiKey": {
+			"type": "string"
+		},
+		"subDomainName": {
+			"type": "string"
+		},
+		"targetDomainName": {
 			"type": "string"
 		},
 		"pollingInterval": {
@@ -18,12 +27,12 @@
 			"type": "Microsoft.Resources/deploymentScripts",
 			"apiVersion": "2020-10-01",
 			"location": "[resourceGroup().location]",
-			"name": "runDeploymentPipeline",
+			"name": "ConfigureAndDeploy",
 			"kind": "AzurePowerShell",
 			"properties": {
 				"azPowerShellVersion": "8.3",
 				"primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/RayvenDeployHook.ps1",
-				"arguments": "[concat(' -deploymentToken ', parameters('deploymentToken'), ' -apiUrl ', parameters('apiUrl'),' -pollingInterval ', parameters('pollingInterval'))]",
+				"arguments": "[concat(' -deploymentToken ', parameters('deploymentToken'), ' -apiUrl ', parameters('deployApiUrl'), ' -apiKey ', parameters('deployApiKey'), ' -subDomainName ', parameters('subDomainName'), ' -targetDomainName ', parameters('targetDomainName') , ' -pollingInterval ', parameters('pollingInterval'))]",
 				"timeout": "PT1H",
 				"cleanupPreference": "OnSuccess",
 				"retentionInterval": "P1D"

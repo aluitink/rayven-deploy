@@ -171,28 +171,6 @@
         "[resourceId('Microsoft.Resources/deployments', 'Storage')]",
         "[resourceId('Microsoft.Resources/deployments', 'Database')]"
       ]
-    },
-    {
-      "name": "ApplicationDeployment",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/infra/deploymentScript.json"
-        },
-        "parameters": {
-          "apiUrl": {
-            "value": "[parameters('deployApiUrl')]"
-          },
-          "deploymentToken": {
-            "value": "[reference('WebApp').outputs.deploymentToken.value]"
-          }
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'WebApp')]"
-      ]
     }
   ],
   "outputs": {
