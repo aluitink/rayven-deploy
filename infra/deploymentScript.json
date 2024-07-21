@@ -42,7 +42,7 @@
 	"outputs": {
 		"deploymentConclusion": {
 			"type": "String",
-			"value": "[reference('runDeploymentPipeline').outputs.conclusion]"
+			"value": "[reference('ConfigureAndDeploy').outputs.conclusion]"
 		}
 	}
 }
