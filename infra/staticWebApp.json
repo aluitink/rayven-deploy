@@ -6,13 +6,24 @@
       "defaultValue": "rayven-app",
       "type": "string"
     },
+    "deployApiUrl": {
+      "type": "string"
+    },
+    "deployApiKey": {
+      "type": "string"
+    },
     "webSku": {
       "type": "string",
       "defaultValue": "Free",
       "allowedValues": [ "Free", "Standard" ]
     },
-    "customDomain": {
-      "defaultValue": "domain.tdl",
+    "subDomainName": {
+      "type": "string"
+    },
+    "rootDnsZone": {
+      "type": "string"
+    },
+    "customDnsName": {
       "type": "string"
     },
     "databaseAccountName": {
@@ -24,6 +35,9 @@
     "databaseConnectionString": {
       "type": "string"
     },
+    "databseIsServerless": {
+      "type": "bool"
+    },
     "storageAccountName": {
       "type": "string"
     },
@@ -32,15 +46,62 @@
     }
   },
   "variables": {
-    "customUrl": "[concat('https://', parameters('customDomain'))]",
-    "storageDomainName": "[concat('z', parameters('customDomain'))]",
-    "storageUrl": "[concat('https://', 's.', parameters('customDomain'))]"
+    "customDnsName": "[concat(parameters('subDomainName'), parameters('rootDnsZone'))]",
+    "customUrl": "[concat('https://', variables('customDnsName'))]",
+    "storageDomainName": "[concat('z', variables('customDnsName'))]",
+    "storageUrl": "[concat('https://', 's.', variables('customDnsName'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Web/staticSites",
       "apiVersion": "2023-12-01",
       "name": "[parameters('instanceName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "rayven-webapp": "1.0"
+      },
+      "properties": {
+
+      },
+      "sku": {
+        "name": "Free",
+        "tier": "Free"
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites/basicAuth",
+      "apiVersion": "2023-12-01",
+      "name": "[concat(parameters('instanceName'), '/default')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
+      "properties": {
+        "applicableEnvironmentsMode": "SpecifiedEnvironments"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2020-10-01",
+      "name": "RayvenCNAME",
+      "kind": "AzurePowerShell",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
+      ],
+      "properties": {
+        "azPowerShellVersion": "8.3",
+        "primaryScriptUri": "https://raw.githubusercontent.com/aluitink/rayven-deploy/main/scripts/RayvenAddDomain.ps1",
+        "arguments": "[concat(' -apiKey ', parameters('deployApiKey'), ' -apiUrl ', parameters('deployApiUrl'),' -subDomainName ', parameters('subDomainName'), ' -targetDomainName ', reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname))]",
+        "timeout": "PT1H",
+        "cleanupPreference": "OnSuccess",
+        "retentionInterval": "P1D"
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-12-01",
+      "name": "[concat(parameters('instanceName'), '/settings')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "rayven-webapp": "1.0"
@@ -60,33 +121,37 @@
           "location": "[resourceGroup().location]",
           "properties": {
             "ApiSettings__AzureDeploymentToken": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]",
-            "ApiSettings__IsServerlessDb": "false",
+            "ApiSettings__RayvenDeployUrl": "[parameters('deployApiUrl')]",
+            "ApiSettings__RayvenDeployKey": "[parameters('deployApiKey')]",
+            "ApiSettings__IsServerlessDb": "[parameters('databseIsServerless')]",
             "ApiSettings__LogRequestHeaders": "false",
-            "ApiSettings__PrimarySuffix": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]",
-            "ApiSettings__PrimaryUrl": "[concat('https://', reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname)]",
+            "ApiSettings__PrimarySuffix": "[variables('customDnsName')]",
+            "ApiSettings__PrimaryUrl": "[concat('https://', variables('customDnsName'))]",
             "ApiSettings__RequireAcceptHeader": "false",
             "ApiSettings__StorageConnectionString": "[parameters('storageConnectionString')]",
             "ApiSettings__StorageUrl": "[variables('storageUrl')]",
-            "OpenApi__HostNames": "",
+            "OpenApi__HostNames": "[variables('customDnsName')]",
             "RepositoryOptions__CosmosConnectionString": "[parameters('databaseConnectionString')]",
             "RepositoryOptions__DatabaseId": "[parameters('databaseName')]"
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Resources/deploymentScripts', 'RayvenCNAME')]",
             "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
           ]
         }
       ]
     },
     {
-      "type": "Microsoft.Web/staticSites/basicAuth",
-      "apiVersion": "2023-12-01",
-      "name": "[concat(parameters('instanceName'), '/default')]",
-      "location": "[resourceGroup().location]",
+      "type": "Microsoft.Web/staticSites/customDomains",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('instanceName'), '/', variables('customDnsName'))]",
+      "kind": "string",
       "dependsOn": [
+        "[resourceId('Microsoft.Resources/deploymentScripts', 'RayvenCNAME')]",
         "[resourceId('Microsoft.Web/staticSites', parameters('instanceName'))]"
       ],
       "properties": {
-        "applicableEnvironmentsMode": "SpecifiedEnvironments"
+        "validationMethod": "cname"
       }
     }
   ],
@@ -98,6 +163,10 @@
     "webAppHostName": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Web/staticSites', parameters('instanceName'))).defaultHostname]"
+    },
+    "customHostName": {
+      "type": "string",
+      "value": ""
     }
   }
 }

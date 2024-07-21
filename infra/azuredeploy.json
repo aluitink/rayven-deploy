@@ -10,6 +10,14 @@
       "type": "string",
       "defaultValue": "https://deploy.rayven.mx"
     },
+    "rootDnsZone": {
+      "type": "string",
+      "defaultValue": "rvn.world"
+    },
+    "deployApiKey": {
+      "type": "securestring",
+      "defaultValue": "80D2C5D8-1514-4FCD-BD5A-E1EB953E8C7D"
+    },
     "databaseName": {
       "type": "string",
       "defaultValue": "Rayven"
@@ -32,9 +40,12 @@
       "minValue": 400,
       "defaultValue": 1000
     },
-    "customDomain": {
-      "defaultValue": "domain.tdl",
-      "type": "string"
+    "customSubDomain": {
+      "defaultValue": "[uniqueString(resourceGroup().id)]",
+      "type": "string",
+      "metadata": {
+        "description": "Select a sub-domain in the rvn.world zone"
+      }
     },
     "storageAccountType": {
       "type": "string",
@@ -122,6 +133,12 @@
           "instanceName": {
             "value": "[parameters('instanceName')]"
           },
+          "deployApiUrl": {
+            "value": "[parameters('deployApiUrl')]"
+          },
+          "deployApiKey": {
+            "value": "[parameters('deployApiKey')]"
+          },
           "webSku": {
             "value": "[parameters('webSku')]"
           },
@@ -134,11 +151,17 @@
           "databaseName": {
             "value": "[parameters('databaseName')]"
           },
+          "databseIsServerless": {
+            "value": "[reference('Database').outputs.databaseIsServerless.value]"
+          },
           "storageAccountName": {
             "value": "[reference('Storage').outputs.storageAccountName.value]"
           },
           "storageConnectionString": {
             "value": "[reference('Storage').outputs.storageConnectionString.value]"
+          },
+          "customDnsName": {
+            "value": "[concat(parameters('customSubDomain'), parameters('rootDnsZone'))]"
           }
         }
       },
