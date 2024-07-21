@@ -46,7 +46,7 @@
     }
   },
   "variables": {
-    "customDnsName": "[concat(parameters('subDomainName'), parameters('rootDnsZone'))]",
+    "customDnsName": "[concat(parameters('subDomainName'), '.', parameters('rootDnsZone'))]",
     "customUrl": "[concat('https://', variables('customDnsName'))]",
     "storageDomainName": "[concat('z', variables('customDnsName'))]",
     "storageUrl": "[concat('https://', 's.', variables('customDnsName'))]"
