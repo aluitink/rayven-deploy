@@ -118,8 +118,8 @@
         },
         "parameters": {
           "deploymentToken": {
-            "value": ""
-          }
+            "value": "[listSecrets(resourceId('Microsoft.Web/staticSites', parameters('instanceName')), '2019-08-01').properties.apiKey]"
+          },
           "deployApiUrl": {
             "value": "[parameters('deployApiUrl')]"
           },
