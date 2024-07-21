@@ -35,6 +35,11 @@ var host = new HostBuilder()
             {
                 configuration.GetSection("ApiSettings").Bind(settings);
             });
+        services.AddOptions<AuthenticationSettings>()
+            .Configure<IConfiguration>((settings, configuration) =>
+            {
+                configuration.GetSection("AuthenticationSettings").Bind(settings);
+            });
     })
     .Build();
 
