@@ -19,7 +19,7 @@
 		},
 		"pollingInterval": {
 			"type": "int",
-			"defaultValue": 10
+			"defaultValue": 60
 		}
 	},
 	"resources": [
