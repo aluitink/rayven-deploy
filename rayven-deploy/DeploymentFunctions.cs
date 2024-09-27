@@ -45,13 +45,14 @@ namespace Rayven.Deploy.App.Models
                 return new ConflictObjectResult("An active deployment is in progress, please try again shortly...");
 
             await _gitHubWorkflowProvider.RunWorkflowAsync(workflow.Id, deploymentRequest.DeploymentToken, _apiSettings.GithubRepositoryBranch /* replace with branch from request */);
+            await Task.Delay(TimeSpan.FromSeconds(10));
             int attempt = 0;
             do
             {
                 attempt++;
                 activeWorkflowRun = await _gitHubWorkflowProvider.GetActiveWorkflowRunAsync(workflow.Id);
                 // backoff
-                await Task.Delay(TimeSpan.FromSeconds(attempt * 2));
+                await Task.Delay(TimeSpan.FromSeconds(attempt * 5));
             }
             while (activeWorkflowRun == null && attempt < deploymentRequest.MaxAttempts);
             if (activeWorkflowRun == null)

@@ -4,7 +4,8 @@ param (
     [string]$apiKey,
     [string]$subDomainName,
     [string]$targetDomainName,
-    [int]$pollingInterval = 10,  # Default polling interval set to 10 seconds
+    [string]$blobDomainName,
+    [int]$pollingInterval = 60,  # Default polling interval set to 30 seconds
     [int]$maxAttempts = 3
 )
 
@@ -120,9 +121,11 @@ function Send-DomainRequest {
 
 # Main script logic
 $domainResponse = Send-DomainRequest -ApiKey $apiKey -SubDomainName $subDomainName -TargetDomainName $targetDomainName -Uri $apiUrl
-if ($domainResponse) {
+$domainResponseStorage = Send-DomainRequest -ApiKey $apiKey -SubDomainName "z.$subDomainName" -TargetDomainName $blobDomainName -Uri $apiUrl
+if ($domainResponse, $domainResponseStorage) {
     $response = Send-DeploymentRequest -uri $apiUrl -apiKey $apiKey -token $deploymentToken -interval $pollingInterval -attempts $maxAttempts
     if ($null -ne $response) {
+        Start-Sleep -Seconds $interval
         $completedWorkflow = Poll-ForCompletion -uri $apiUrl -apiKey $apiKey -workflowRun $response -interval $pollingInterval
         Write-Output "Workflow has finished executing."
         $DeploymentScriptOutputs = @{}
